@@ -18,7 +18,8 @@ namespace Domain.Entities
         public decimal PurchasePrice { get; set; } // Giá nhập
         public decimal SellingPrice { get; set; }  // Giá bán
         public decimal TaxRatePaid { get; set; } // Mức thuế phải chịu của sản phẩm (VD 8% 10%)
-        public bool IsActive { get; set; } 
+        public bool IsActive { get; set; }
+        public bool IsDeleted { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
     }

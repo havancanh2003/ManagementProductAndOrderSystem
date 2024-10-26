@@ -35,7 +35,7 @@ namespace Infrastructure.Repositories
             return await _dbContext.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<Order?> UpdateAsync(Order order)
+        public async Task<Order> UpdateAsync(Order order)
         {
             _dbContext.Orders.Update(order);
             await _dbContext.SaveChangesAsync();

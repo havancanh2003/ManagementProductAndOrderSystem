@@ -9,10 +9,10 @@ namespace Application.Services
 {
     public interface IOrderService
     {
-        Task<OrderDto?> AddOrderAsync(OrderDto model);
         Task<OrderDto?> GetOrderByCode(string code);
         Task<OrderDto?> GetOrderById(int id);
         Task<List<OrderDto>> GetAllOrderAsync();
         Task<(bool IsSuccess, string mess, OrderDto? orderDtoReturn)> UpdateOrderAsync(OrderDto orderDto);
+        Task<OrderDto> AddOrderAsync(OrderDto model);
     }
 }

@@ -18,22 +18,36 @@ namespace Application.Services
             _productService = productService;
             _mapper = mapper;
         }
+        /// <summary>
+        /// Service lấy danh sách đơn hàng
+        /// </summary>
         public async Task<List<OrderDto>> GetAllOrderAsync()
         {
             var orders = await _orderRepository.GetAllAsync();
             return orders.Select(o => MapToOrderDto(o)).ToList();
         }
+
+        /// <summary>
+        /// Service lấy đơn hàng theo id
+        /// </summary>
         public async Task<OrderDto?> GetOrderById(int id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
             return order != null ? MapToOrderDto(order) : null;
         }
+
+        /// <summary>
+        /// Service lấy đơn hàng theo mã code
+        /// </summary>
         public async Task<OrderDto?> GetOrderByCode(string code)
         {
             var order = await _orderRepository.GetByCodeAsync(code);
             return order != null ? MapToOrderDto(order) : null;
         }
-        public async Task<OrderDto?> AddOrderAsync(OrderDto model)
+        /// <summary>
+        /// Tạo mới đơn hàng
+        /// </summary>
+        public async Task<OrderDto> AddOrderAsync(OrderDto model)
         {
             var order = new Order
             {
@@ -45,7 +59,6 @@ namespace Application.Services
             };
             foreach (var itemDto in model.Items)
             {
-                //var salePrice = itemDto.SalePrice > 0 ? itemDto.SalePrice : product.SalePrice;
                 var orderItem = new OrderItem
                 {
                     ProductId = itemDto.ProductId,
@@ -67,6 +80,12 @@ namespace Application.Services
             return MapToOrderDto(result);
         }
 
+        /// <summary>
+        /// Service update đơn hàng
+        /// Triển khai dựa trên: 
+        /// + so sánh có sự thay đổi trong "OrderItem" ko(ví dự như thêm hoặc xóa 1 orderItem khỏi order )
+        ///   nếu có(OrderItem: thay đổi về số lượng) thì sẽ sử lí logic, nếu ko thì back lại
+        /// </summary>
         public async Task<(bool IsSuccess, string mess, OrderDto? orderDtoReturn)> UpdateOrderAsync(OrderDto orderDto)
         {
             var existingOrder = await _orderRepository.GetByIdAsync(orderDto.Id);
@@ -89,7 +108,7 @@ namespace Application.Services
 
                 if (orderItem != null)
                 {
-                    // Nếu số lượng hoặc giá bán thay đổi, cập nhật lại
+                    // Nếu số lượng thay đổi, cập nhật lại
                     if (orderItem.Quantity != itemDto.Quantity)
                     {
                         orderItem.Quantity = itemDto.Quantity;
@@ -100,7 +119,7 @@ namespace Application.Services
                 }
                 else
                 {
-                    // Thêm sản phẩm mới vào đơn hàng nếu chưa tồn tại
+                    // Thêm sản phẩm mới vào đơn hàng nếu nó chưa tồn tại trong đơn hàng
                     var product = await _productService.GetProductById(itemDto.ProductId);
                     if (product == null)
                         return (false, $"Sản phẩm với ID {itemDto.ProductId} không tồn tại.",null);
@@ -126,12 +145,15 @@ namespace Application.Services
             // Tính lại tiền 
             existingOrder.TotalAmount = existingOrder.OrderItems.Sum(i => i.TaxDeductibleAmount);
             existingOrder.TaxAmountOrder = existingOrder.OrderItems.Sum(i => i.TaxAmount);
-
+            existingOrder.UpdatedDate = DateTime.UtcNow;
             var result = await _orderRepository.UpdateAsync(existingOrder);
 
             return (true, string.Empty, MapToOrderDto(result));
         }
 
+        /// <summary>
+        /// Tạo mã đơn hàng tự động và tuần tự
+        /// </summary>
         private async Task<string> GenerateOrderCode()
         {
             var today = DateTime.UtcNow.ToString("yyMMdd");
@@ -144,6 +166,11 @@ namespace Application.Services
             int nextId = (lastOrder == null) ? 1 : int.Parse(lastOrder.OrderCode.Substring(8)) + 1;
             return $"OD{today}{nextId:D3}";
         }
+
+        /// <summary>
+        /// Mapper order entity sang orderDto
+        /// </summary>
+       
         private OrderDto MapToOrderDto(Order order)
         {
             return new OrderDto
