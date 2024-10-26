@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Domain.Entities
         public decimal TotalAmount { get; set; }
         public decimal TaxAmountOrder { get; set; }
         public DateTime CreatedDate { get; set; }
-
-        public ICollection<OrderItem> OrderItems { get; set; }
+        public DateTime UpdatedDate { get; set; }
+        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

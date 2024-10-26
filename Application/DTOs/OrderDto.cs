@@ -17,7 +17,7 @@ namespace Application.DTOs
         public decimal TotalAmount { get; set; }
         public decimal TaxAmountOrder { get; set; }
         public DateTime CreatedDate { get; set; }
-
-        public ICollection<OrderItemDto> OrderItems { get; set; }
+        public DateTime UpdatedDate { get; set; }
+        public List<OrderItemDto> Items { get; set; } = new List<OrderItemDto>();
     }
 }

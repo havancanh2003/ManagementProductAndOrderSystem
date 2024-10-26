@@ -11,8 +11,6 @@ namespace Application.DTOs
         public decimal Price { get; set; }
         public decimal TaxRate { get; set; }  // Tỉ lệ thuế
         public decimal TaxAmount { get; set; } // Số tiền thuế từng dòng
-
-        public Order Order { get; set; } = null!;
-        public Product Product { get; set; } = null!;
+        
     }
 }

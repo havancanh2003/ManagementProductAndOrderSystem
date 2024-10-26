@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -10,24 +11,35 @@ namespace Infrastructure.Repositories
         {
             _dbContext = dbContext;
         }
-        public Task AddAsync(Order order)
+
+        public async Task<Order> AddAsync(Order order)
         {
-            throw new NotImplementedException();
+            _dbContext.Orders.Add(order);
+            await _dbContext.SaveChangesAsync();
+            return order;
         }
 
-        public  Task<IEnumerable<Order>> GetAllAsync()
+        public async Task<List<Order>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _dbContext.Orders.Include(o => o.OrderItems).ToListAsync();
         }
 
-        public Task<Order> GetByIdAsync(int id)
+        public async Task<Order?> GetByCodeAsync(string code)
         {
-            throw new NotImplementedException();
+            var order = await _dbContext.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.OrderCode == code);
+            return order;
         }
 
-        public Task UpdateAsync(Order order)
+        public async Task<Order?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<Order> UpdateAsync(Order order)
+        {
+            _dbContext.Orders.Update(order);
+            await _dbContext.SaveChangesAsync();
+            return order;
         }
     }
 }
