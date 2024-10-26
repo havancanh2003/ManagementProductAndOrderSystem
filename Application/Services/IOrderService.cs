@@ -13,5 +13,6 @@ namespace Application.Services
         Task<OrderDto?> GetOrderByCode(string code);
         Task<OrderDto?> GetOrderById(int id);
         Task<List<OrderDto>> GetAllOrderAsync();
+        Task<(bool IsSuccess, string mess, OrderDto? orderDtoReturn)> UpdateOrderAsync(OrderDto orderDto);
     }
 }

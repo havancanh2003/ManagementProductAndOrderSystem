@@ -18,5 +18,6 @@ namespace Domain.Interfaces
         Task<Product> GetByIdAsync(int id);
         Task<List<Product>> SearchAsync(string searchTerm);
         Task UpdateRangeAsync(IEnumerable<Product> products);
+        //Task<string> GetProductCodeById(int id);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Application.DTOs;
+﻿using Application.Common;
+using Application.DTOs;
 using Application.Services;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -56,10 +57,17 @@ namespace WebApi.Controllers
 
                     var orderItem = new OrderItemDto
                     {
-                        ProductId = item.ProductId,
+                        ProductCode = p.ProductCode,
+                        ProductId = p.Id,
                         Quantity = item.Quantity,
-                        Price = item.Price
+                        Price = p.SellingPrice,
+                        TaxRate = p.TaxRatePaid,
                     };
+                    orderItem.TotalAmountNoTax = Calculate.CalculateTotalAmountNoTax(orderItem.Quantity, orderItem.Price);
+                    orderItem.TaxAmount = Calculate.CalculateTaxAmount(orderItem.TotalAmountNoTax, p.TaxRatePaid);
+                    orderItem.TaxDeductibleAmount = Calculate.CalculateTotalAmountAndTax(orderItem.TotalAmountNoTax, orderItem.TaxAmount);
+
+
                     orderDto.Items.Add(orderItem);
                 }
                 var result = await _orderService.AddOrderAsync(orderDto);
@@ -68,6 +76,46 @@ namespace WebApi.Controllers
             catch (Exception ex)
             {
                 return BadRequest();
+            }
+        }
+
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] CreateOrUpdateOrder model)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderById(id);
+                if (order == null) 
+                    return NotFound();
+
+                if (string.IsNullOrEmpty(model.CustomerName) || string.IsNullOrEmpty(model.CustomerPhone))
+                    return BadRequest("Tên và số điện thoại khách hàng là bắt buộc cho 1 đơn hàng");
+
+                var orderDto = new OrderDto
+                {
+                    Id = order.Id,
+                    CustomerName = model.CustomerName,
+                    CustomerPhone = model.CustomerPhone,
+                };
+                foreach (var iupdate in model.Items)
+                {
+                    var itemUpdate = new OrderItemDto
+                    {
+                        ProductId = iupdate.ProductId,
+                        Quantity = iupdate.Quantity,
+                    };
+                    orderDto.Items.Add(itemUpdate);
+                }
+                var result = await _orderService.UpdateOrderAsync(orderDto);
+                if(result.IsSuccess)
+                    return Ok(result.orderDtoReturn);
+
+                return BadRequest(result.mess);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }
