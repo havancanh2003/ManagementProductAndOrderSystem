@@ -12,6 +12,7 @@ namespace Application.Services
     {
         Task<List<ProductDto>> SearchProductByNameOrByCode(string searchTerm);
         Task<ProductDto?> GetProductById(int id);
+        Task<IEnumerable<ProductDto>> GetAllProductActiveAsync();
         Task<ProductDto?> GetProductByCode(string code);
         Task<IEnumerable<ProductDto>> GetAllProductAsync();
         Task<(IEnumerable<ProductDto> Products, int TotalCount)> GetPagedProductsAsync(int pageIndex, int pageSize, string searchTerm);

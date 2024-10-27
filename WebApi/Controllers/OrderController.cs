@@ -37,13 +37,25 @@ namespace WebApi.Controllers
         /// <summary>
         /// lấy danh sách đơn hàng theo code
         /// </summary>
-        [HttpGet("{code}")]
+        [HttpGet("code")]
         public async Task<IActionResult> GetOrderByCode(string code)
         {
             if (string.IsNullOrEmpty(code))
-                return BadRequest("Mã đơn hàng ko");
+                return BadRequest("Mã code đơn hàng không tồn tại");
 
             var order = await _orderService.GetOrderByCode(code);
+            if (order == null)
+                return NotFound();
+
+            return Ok(order);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrderById(int id)
+        {
+            if (id <= 0)
+                return BadRequest("Id đơn hàng không tồn tại");
+
+            var order = await _orderService.GetOrderById(id);
             if (order == null)
                 return NotFound();
 

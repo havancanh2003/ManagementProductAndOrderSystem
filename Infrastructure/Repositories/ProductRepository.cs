@@ -23,6 +23,8 @@ namespace Infrastructure.Repositories
             if (product == null) return false;
 
             product.IsDeleted = true;
+            product.IsActive = false;
+
 
             await _dbContext.SaveChangesAsync();
             return true;
@@ -40,6 +42,7 @@ namespace Infrastructure.Repositories
             foreach (var product in products)
             {
                 product.IsDeleted = true;
+                product.IsActive = false;
             }
 
             await _dbContext.SaveChangesAsync();

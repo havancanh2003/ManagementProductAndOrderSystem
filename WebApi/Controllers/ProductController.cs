@@ -28,6 +28,16 @@ namespace WebApi.Controllers
             var products = await _productService.GetAllProductAsync();
             return Ok(products);
         }
+        /// <summary>
+        /// get active
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("active")]
+        public async Task<IActionResult> GetAllProductActive()
+        {
+            var products = await _productService.GetAllProductActiveAsync();
+            return Ok(products);
+        }
 
         /// <summary>
         /// Danh sách phân trang
@@ -51,7 +61,7 @@ namespace WebApi.Controllers
         /// <summary>
         /// Lấy sản phẩm theo mã code sản phẩm
         /// </summary>
-        [HttpGet("{code}")]
+        [HttpGet("code/{code}")]
         public async Task<IActionResult> GetProductByCode(string code)
         {
             if (string.IsNullOrEmpty(code))
@@ -60,6 +70,19 @@ namespace WebApi.Controllers
             var product = await _productService.GetProductByCode(code.Trim());
 
             if (product == null) 
+                return NotFound();
+
+            return Ok(product);
+        }
+        [HttpGet("id/{id}")]
+        public async Task<IActionResult> GetProductById(int id)
+        {
+            if (id <= 0)
+                return BadRequest("Không tồn tại");
+
+            var product = await _productService.GetProductById(id);
+
+            if (product == null)
                 return NotFound();
 
             return Ok(product);
@@ -229,13 +252,13 @@ namespace WebApi.Controllers
             if (string.IsNullOrEmpty(model.Unit))
                 return "Đơn vị tính là bắt buộc.";
 
-            if (model.PurchasePrice < 0)
+            if (model.PurchasePrice <= 0)
                 return "Giá nhập không được âm.";
 
-            if (model.SellingPrice < 0)
+            if (model.SellingPrice <= 0)
                 return "Giá bán không được âm.";
 
-            if (model.TaxRatePaid < 0 || model.TaxRatePaid > 100)
+            if (model.TaxRatePaid != 8 && model.TaxRatePaid != 10)
                 return "Mức thuế phải chịu của sản phầm là 8% hoặc 10%";
 
             return string.Empty;
